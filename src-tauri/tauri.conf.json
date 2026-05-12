@@ -1,0 +1,58 @@
+{
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devPath": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "distDir": "../dist"
+  },
+  "package": {
+    "productName": "ScreenShot",
+    "version": "0.1.0"
+  },
+  "tauri": {
+    "allowlist": {
+      "clipboard": {
+        "writeText": true
+      },
+      "globalShortcut": {
+        "all": true
+      },
+      "shell": {
+        "all": true,
+        "open": true
+      }
+    },
+    "bundle": {
+      "active": true,
+      "targets": "all",
+      "identifier": "com.screen-shot.app",
+      "icon": [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png",
+        "icons/icon.icns",
+        "icons/icon.ico"
+      ]
+    },
+    "security": {
+      "csp": null
+    },
+    "windows": [
+      {
+        "fullscreen": false,
+        "transparent": true,
+        "decorations": false,
+        "resizable": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "visible": false,
+        "width": 1920,
+        "height": 1080
+      }
+    ],
+    "systemTray": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true
+    }
+  }
+}
