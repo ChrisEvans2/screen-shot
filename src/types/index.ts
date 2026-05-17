@@ -11,6 +11,7 @@ export interface Selection {
 }
 
 export type ToolType = 
+  | 'select'
   | 'rectangle'
   | 'ellipse'
   | 'arrow'

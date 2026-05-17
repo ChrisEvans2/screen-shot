@@ -8,11 +8,12 @@ interface Selection {
   height: number
 }
 
-type HandleType = 'nw' | 'n' | 'ne' | 'w' | 'e' | 'sw' | 's' | 'se'
+type HandleType = 'nw' | 'n' | 'ne' | 'w' | 'e' | 'sw' | 's' | 'se' | 'move'
 
 const props = defineProps<{
   mode: 'create' | 'adjust'
   initialSelection?: Selection
+  canMove?: boolean // 是否可以移动选区
 }>()
 
 const emit = defineEmits<{
@@ -76,6 +77,10 @@ const onMouseMove = (e: MouseEvent) => {
     let newHeight = orig.height
     
     switch (activeHandle.value) {
+      case 'move':
+        newX = orig.x + dx
+        newY = orig.y + dy
+        break
       case 'nw':
         newX = orig.x + dx
         newY = orig.y + dy
@@ -195,6 +200,9 @@ onUnmounted(() => {
         <div class="handle handle-sw" @mousedown="onHandleMouseDown($event, 'sw')"></div>
         <div class="handle handle-s" @mousedown="onHandleMouseDown($event, 's')"></div>
         <div class="handle handle-se" @mousedown="onHandleMouseDown($event, 'se')"></div>
+        
+        <!-- 移动区域（仅在 canMove 时显示） -->
+        <div v-if="canMove" class="move-area" @mousedown="onHandleMouseDown($event, 'move')"></div>
       </div>
       
       <!-- 尺寸标签 -->
@@ -223,8 +231,7 @@ onUnmounted(() => {
   position: absolute;
   border: 2px solid #00ffff;
   background: transparent;
-  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3);
-  pointer-events: none;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3), 0 0 0 1px #00ffff;
 }
 
 .handles {
@@ -296,6 +303,16 @@ onUnmounted(() => {
   bottom: -5px;
   right: -5px;
   cursor: se-resize;
+}
+
+.move-area {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  cursor: move;
+  pointer-events: auto;
 }
 
 .size-label {

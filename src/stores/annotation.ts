@@ -2,7 +2,7 @@ import { ref, computed } from 'vue'
 import type { Annotation, ToolType, HSLColor, MosaicOptions } from '../types'
 
 const annotations = ref<Annotation[]>([])
-const currentTool = ref<ToolType>('rectangle')
+const currentTool = ref<ToolType>('select')
 const currentColor = ref<HSLColor>({ h: 210, s: 80, l: 60 })
 const currentLineWidth = ref(2)
 const currentFontSize = ref(24)

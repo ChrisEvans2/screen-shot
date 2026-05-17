@@ -152,6 +152,7 @@ defineExpose({ show, hide })
       <SelectionArea
         mode="adjust"
         :initialSelection="selection"
+        :canMove="store.currentTool.value === 'select'"
         @selectionChange="onSelectionChange"
         @dragStart="onDragStart"
         @dragEnd="onDragEnd"

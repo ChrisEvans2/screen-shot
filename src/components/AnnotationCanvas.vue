@@ -367,6 +367,7 @@ onMounted(() => {
   <canvas
     ref="canvasRef"
     class="annotation-canvas"
+    :class="{ 'select-mode': store.currentTool.value === 'select' }"
     :style="{
       left: `${selection.x}px`,
       top: `${selection.y}px`,
@@ -405,6 +406,11 @@ onMounted(() => {
   position: absolute;
   cursor: crosshair;
   z-index: 20;
+}
+
+.annotation-canvas.select-mode {
+  pointer-events: none;
+  cursor: default;
 }
 
 .text-input-container {
