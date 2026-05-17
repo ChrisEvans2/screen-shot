@@ -8,7 +8,7 @@ interface Selection {
   height: number
 }
 
-type HandleType = 'nw' | 'n' | 'ne' | 'w' | 'e' | 'sw' | 's' | 'se' | 'move'
+type HandleType = 'nw' | 'n' | 'ne' | 'w' | 'e' | 'sw' | 's' | 'se'
 
 const props = defineProps<{
   mode: 'create' | 'adjust'
@@ -31,7 +31,6 @@ const activeHandle = ref<HandleType | null>(null)
 const dragStart = ref({ x: 0, y: 0 })
 const originalSelection = ref<Selection | null>(null)
 
-// 监听 initialSelection 变化
 watch(() => props.initialSelection, (newVal) => {
   if (newVal) {
     selection.value = { ...newVal }
@@ -77,10 +76,6 @@ const onMouseMove = (e: MouseEvent) => {
     let newHeight = orig.height
     
     switch (activeHandle.value) {
-      case 'move':
-        newX = orig.x + dx
-        newY = orig.y + dy
-        break
       case 'nw':
         newX = orig.x + dx
         newY = orig.y + dy
@@ -117,7 +112,6 @@ const onMouseMove = (e: MouseEvent) => {
         break
     }
     
-    // 确保最小尺寸
     if (newWidth < 20) {
       if (activeHandle.value.includes('w')) {
         newX = orig.x + orig.width - 20
@@ -157,6 +151,9 @@ const onMouseUp = (e: MouseEvent) => {
 }
 
 const onHandleMouseDown = (e: MouseEvent, handle: HandleType) => {
+  // 只响应左键
+  if (e.button !== 0) return
+  
   e.stopPropagation()
   e.preventDefault()
   activeHandle.value = handle
@@ -165,20 +162,14 @@ const onHandleMouseDown = (e: MouseEvent, handle: HandleType) => {
   emit('dragStart')
 }
 
-const onContextMenu = (e: MouseEvent) => {
-  e.preventDefault()
-}
-
 onMounted(() => {
   window.addEventListener('mousemove', onMouseMove)
   window.addEventListener('mouseup', onMouseUp)
-  window.addEventListener('contextmenu', onContextMenu)
 })
 
 onUnmounted(() => {
   window.removeEventListener('mousemove', onMouseMove)
   window.removeEventListener('mouseup', onMouseUp)
-  window.removeEventListener('contextmenu', onContextMenu)
 })
 </script>
 
@@ -204,9 +195,6 @@ onUnmounted(() => {
         <div class="handle handle-sw" @mousedown="onHandleMouseDown($event, 'sw')"></div>
         <div class="handle handle-s" @mousedown="onHandleMouseDown($event, 's')"></div>
         <div class="handle handle-se" @mousedown="onHandleMouseDown($event, 'se')"></div>
-        
-        <!-- 移动区域 -->
-        <div class="move-area" @mousedown="onHandleMouseDown($event, 'move')"></div>
       </div>
       
       <!-- 尺寸标签 -->
@@ -223,10 +211,12 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   z-index: 10;
+  pointer-events: none;
 }
 
 .selection-container.create-mode {
   cursor: crosshair;
+  pointer-events: auto;
 }
 
 .selection-rect {
@@ -234,6 +224,7 @@ onUnmounted(() => {
   border: 2px solid #00ffff;
   background: transparent;
   box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
 }
 
 .handles {
@@ -242,6 +233,7 @@ onUnmounted(() => {
   left: 0;
   width: 100%;
   height: 100%;
+  pointer-events: none;
 }
 
 .handle {
@@ -251,6 +243,7 @@ onUnmounted(() => {
   background: #00ffff;
   border: 1px solid #008888;
   z-index: 10;
+  pointer-events: auto;
 }
 
 .handle-nw {
@@ -303,15 +296,6 @@ onUnmounted(() => {
   bottom: -5px;
   right: -5px;
   cursor: se-resize;
-}
-
-.move-area {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  right: 10px;
-  bottom: 10px;
-  cursor: move;
 }
 
 .size-label {

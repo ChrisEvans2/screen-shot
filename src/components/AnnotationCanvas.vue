@@ -404,6 +404,7 @@ onMounted(() => {
 .annotation-canvas {
   position: absolute;
   cursor: crosshair;
+  z-index: 20;
 }
 
 .text-input-container {

@@ -10,8 +10,7 @@ import type { Selection } from '../types'
 const isVisible = ref(false)
 const screenshotData = ref<string>('')
 const selection = ref<Selection | null>(null)
-const isSelecting = ref(true) // 正在创建选区
-const isDragging = ref(false) // 正在拖动选区
+const isDragging = ref(false)
 const store = useAnnotationStore()
 
 const show = async (base64Data?: string) => {
@@ -27,7 +26,6 @@ const show = async (base64Data?: string) => {
   
   isVisible.value = true
   selection.value = null
-  isSelecting.value = true
   isDragging.value = false
   store.clearAnnotations()
 }
@@ -35,16 +33,16 @@ const show = async (base64Data?: string) => {
 const hide = async () => {
   isVisible.value = false
   selection.value = null
-  isSelecting.value = true
   isDragging.value = false
   await invoke('hide_window')
 }
 
+// 框选完成，进入编辑模式
 const onSelectionComplete = (sel: Selection) => {
   selection.value = sel
-  isSelecting.value = false
 }
 
+// 选区变化（拖动调整时）
 const onSelectionChange = (sel: Selection) => {
   selection.value = sel
 }
@@ -127,19 +125,12 @@ const onKeyDown = (e: KeyboardEvent) => {
   }
 }
 
-const onContextMenu = (e: MouseEvent) => {
-  e.preventDefault()
-  handleCancel()
-}
-
 onMounted(() => {
   window.addEventListener('keydown', onKeyDown)
-  window.addEventListener('contextmenu', onContextMenu)
 })
 
 onUnmounted(() => {
   window.removeEventListener('keydown', onKeyDown)
-  window.removeEventListener('contextmenu', onContextMenu)
 })
 
 defineExpose({ show, hide })
@@ -147,17 +138,17 @@ defineExpose({ show, hide })
 
 <template>
   <div v-if="isVisible" class="overlay">
-    <!-- 创建选区阶段 -->
+    <!-- 阶段1：框选阶段（selection 还没有） -->
     <SelectionArea
-      v-if="isSelecting"
+      v-if="!selection"
       mode="create"
       @selectionComplete="onSelectionComplete"
       @cancel="handleCancel"
     />
     
-    <!-- 标注阶段：选区 + 标注画布 + 工具栏 -->
-    <template v-else-if="selection">
-      <!-- 选区调整层（始终显示） -->
+    <!-- 阶段2：编辑阶段（selection 已创建） -->
+    <template v-else>
+      <!-- 选区调整层 -->
       <SelectionArea
         mode="adjust"
         :initialSelection="selection"
