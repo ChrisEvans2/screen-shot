@@ -28,6 +28,7 @@ const show = async (base64Data?: string) => {
   selection.value = null
   isDragging.value = false
   store.clearAnnotations()
+  store.currentTool.value = 'select' // 重置为空状态
 }
 
 const hide = async () => {
