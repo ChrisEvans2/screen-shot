@@ -38,14 +38,15 @@ const onMouseDown = (e: MouseEvent) => {
     return
   }
   
-  // 如果正在调整模式，点击外部取消
+  // 如果正在调整模式，点击外部确认选区
   if (isAdjusting.value) {
     const rect = selection.value
     if (rect) {
       const inX = e.clientX >= rect.x && e.clientX <= rect.x + rect.width
       const inY = e.clientY >= rect.y && e.clientY <= rect.y + rect.height
       if (!inX || !inY) {
-        emit('cancel')
+        // 点击外部确认选区
+        onConfirm()
         return
       }
     }
