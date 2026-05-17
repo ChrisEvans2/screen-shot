@@ -145,7 +145,7 @@ const lightGradient = computed(() => {
   display: flex;
   align-items: center;
   gap: 8px;
-  z-index: 1000;
+  z-index: 10001;
   color: #e0e0e0;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(10px);
