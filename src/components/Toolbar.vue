@@ -11,7 +11,6 @@ const emit = defineEmits<{
 const store = useAnnotationStore()
 
 const tools: { type: ToolType; label: string; icon: string }[] = [
-  { type: 'select', label: '选择', icon: '⬚' },
   { type: 'rectangle', label: '矩形', icon: '□' },
   { type: 'ellipse', label: '椭圆', icon: '○' },
   { type: 'arrow', label: '箭头', icon: '→' },
@@ -25,7 +24,7 @@ const fontSizes = [12, 16, 20, 24, 32, 48, 72]
 
 const selectTool = (tool: ToolType) => {
   // 再次点击已选工具，取消选择，回到空状态
-  if (store.currentTool.value === tool && tool !== 'select') {
+  if (store.currentTool.value === tool) {
     store.currentTool.value = 'select'
   } else {
     store.currentTool.value = tool
