@@ -174,7 +174,11 @@ const drawAnnotation = (annotation: Annotation) => {
 let backgroundImage: HTMLImageElement | null = null
 
 const redraw = () => {
-  if (!ctx.value) return
+  if (!ctx.value || !canvasRef.value) return
+  
+  // 更新 canvas 大小
+  canvasRef.value.width = props.selection.width
+  canvasRef.value.height = props.selection.height
   
   ctx.value.clearRect(0, 0, props.selection.width, props.selection.height)
   
@@ -192,6 +196,7 @@ const redraw = () => {
 }
 
 watch(() => store.annotations.value, redraw, { deep: true })
+watch(() => props.selection, redraw, { deep: true })
 
 const getCanvasPoint = (e: MouseEvent): Point => {
   const rect = canvasRef.value!.getBoundingClientRect()

@@ -10,7 +10,8 @@ import type { Selection } from '../types'
 const isVisible = ref(false)
 const screenshotData = ref<string>('')
 const selection = ref<Selection | null>(null)
-const isAnnotating = ref(false)
+const isSelecting = ref(true) // 正在创建选区
+const isDragging = ref(false) // 正在拖动选区
 const store = useAnnotationStore()
 
 const show = async (base64Data?: string) => {
@@ -26,20 +27,34 @@ const show = async (base64Data?: string) => {
   
   isVisible.value = true
   selection.value = null
-  isAnnotating.value = false
+  isSelecting.value = true
+  isDragging.value = false
   store.clearAnnotations()
 }
 
 const hide = async () => {
   isVisible.value = false
   selection.value = null
-  isAnnotating.value = false
+  isSelecting.value = true
+  isDragging.value = false
   await invoke('hide_window')
 }
 
 const onSelectionComplete = (sel: Selection) => {
   selection.value = sel
-  isAnnotating.value = true
+  isSelecting.value = false
+}
+
+const onSelectionChange = (sel: Selection) => {
+  selection.value = sel
+}
+
+const onDragStart = () => {
+  isDragging.value = true
+}
+
+const onDragEnd = () => {
+  isDragging.value = false
 }
 
 const handleSave = async () => {
@@ -132,18 +147,34 @@ defineExpose({ show, hide })
 
 <template>
   <div v-if="isVisible" class="overlay">
+    <!-- 创建选区阶段 -->
     <SelectionArea
-      v-if="!isAnnotating"
+      v-if="isSelecting"
+      mode="create"
       @selectionComplete="onSelectionComplete"
       @cancel="handleCancel"
     />
     
+    <!-- 标注阶段：选区 + 标注画布 + 工具栏 -->
     <template v-else-if="selection">
+      <!-- 选区调整层（始终显示） -->
+      <SelectionArea
+        mode="adjust"
+        :initialSelection="selection"
+        @selectionChange="onSelectionChange"
+        @dragStart="onDragStart"
+        @dragEnd="onDragEnd"
+      />
+      
+      <!-- 标注画布 -->
       <AnnotationCanvas
         :screenshotData="screenshotData"
         :selection="selection"
       />
+      
+      <!-- 工具栏（拖动时隐藏） -->
       <Toolbar
+        v-if="!isDragging"
         @save="handleSave"
         @cancel="handleCancel"
       />
@@ -160,6 +191,5 @@ defineExpose({ show, hide })
   height: 100vh;
   background: rgba(0, 0, 0, 0.5);
   z-index: 9999;
-  cursor: crosshair;
 }
 </style>
